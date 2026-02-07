@@ -34,7 +34,7 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background */
+        /* Animated Background - Enhanced */
         .bg-animation {
             position: fixed;
             top: 0;
@@ -43,37 +43,83 @@
             height: 100%;
             z-index: -1;
             overflow: hidden;
+            background: radial-gradient(ellipse at top, #0f0f1e 0%, #0a0a0f 100%);
         }
 
         .bg-animation::before {
             content: '';
             position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
             border-radius: 50%;
-            top: -250px;
-            right: -250px;
-            animation: float 20s ease-in-out infinite;
+            top: -300px;
+            right: -200px;
+            animation: float 25s ease-in-out infinite;
+            filter: blur(60px);
         }
 
         .bg-animation::after {
             content: '';
             position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -250px;
+            left: -150px;
+            animation: float 20s ease-in-out infinite reverse;
+            filter: blur(50px);
+        }
+
+        /* Additional floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.6;
+            animation: floatOrb 30s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            bottom: -200px;
-            left: -200px;
-            animation: float 15s ease-in-out infinite reverse;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.08), transparent);
+            top: 60%;
+            right: 15%;
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08), transparent);
+            bottom: 30%;
+            left: 50%;
+            animation-delay: 10s;
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(100px, 100px) rotate(90deg); }
-            50% { transform: translate(200px, 50px) rotate(180deg); }
-            75% { transform: translate(100px, -50px) rotate(270deg); }
+            0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(150px, 100px) rotate(90deg) scale(1.1); }
+            50% { transform: translate(250px, 50px) rotate(180deg) scale(0.9); }
+            75% { transform: translate(100px, -80px) rotate(270deg) scale(1.05); }
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+            33% { transform: translate(100px, -100px) scale(1.2); opacity: 0.8; }
+            66% { transform: translate(-80px, 80px) scale(0.8); opacity: 0.5; }
         }
 
         /* Navigation */
@@ -97,20 +143,20 @@
         }
 
         .logo {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
         }
 
         .nav-badge {
             background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink));
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
             font-weight: 700;
             color: white;
             animation: pulse 2s ease-in-out infinite;
@@ -124,26 +170,27 @@
         /* Hero Section */
         .hero {
             max-width: 1400px;
-            margin: 60px auto 40px;
+            margin: 40px auto 30px;
             padding: 0 40px;
             text-align: center;
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 2.5rem;
             font-weight: 900;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: linear-gradient(135deg, #fff 0%, var(--accent-purple) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            line-height: 1.2;
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 40px;
+            max-width: 550px;
+            margin: 0 auto 30px;
         }
 
         /* Container */
@@ -200,32 +247,32 @@
         }
 
         .tool-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 18px;
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.15));
             border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .tool-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 12px;
+            font-size: 1.15rem;
+            margin-bottom: 10px;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .ai-badge {
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.65rem;
             font-weight: 700;
             color: white;
             text-transform: uppercase;
@@ -234,9 +281,9 @@
 
         .tool-card p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 25px;
-            line-height: 1.6;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
         /* File Input */
@@ -279,10 +326,10 @@
         /* Buttons */
         .btn {
             width: 100%;
-            padding: 16px 32px;
+            padding: 13px 28px;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 11px;
+            font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -349,21 +396,21 @@
         }
 
         .result-box h3 {
-            font-size: 1.6rem;
-            margin-bottom: 20px;
+            font-size: 1.3rem;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .ai-summary-box {
             background: rgba(249, 115, 22, 0.1);
             border: 1px solid var(--accent-orange);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            line-height: 1.8;
-            font-size: 1.05rem;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 18px;
+            line-height: 1.7;
+            font-size: 0.95rem;
             color: var(--text-primary);
         }
 
@@ -421,8 +468,8 @@
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 14px;
+            padding: 20px;
             text-align: center;
             transition: all 0.3s ease;
         }
@@ -433,7 +480,7 @@
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 900;
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
             -webkit-background-clip: text;
@@ -443,14 +490,18 @@
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 8px;
+            font-size: 0.8rem;
+            margin-top: 6px;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 0.9rem;
             }
 
             .tools-grid {
@@ -467,6 +518,10 @@
 
             .nav-badge {
                 display: none;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
             }
         }
 
@@ -490,16 +545,16 @@
         .features {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 15px;
+            gap: 10px;
+            margin-top: 12px;
         }
 
         .feature-tag {
             background: rgba(139, 92, 246, 0.1);
             border: 1px solid rgba(139, 92, 246, 0.3);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
             color: var(--accent-purple);
             font-weight: 600;
         }
@@ -507,6 +562,9 @@
 </head>
 <body>
     <div class="bg-animation"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
     <!-- Navigation -->
     <nav class="navbar">
