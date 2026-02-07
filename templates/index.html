@@ -1,46 +1,86 @@
+
+
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiConvert Pro - Hepsi Bir Arada</title>
+    <title>MegaConvert - Hepsi Bir Arada Çözüm</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
-        .tool-card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #334155; transition: 0.3s; }
-        .tool-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-        h1 { margin-bottom: 40px; color: var(--primary); font-size: 2.5rem; }
-        input[type="file"] { margin: 15px 0; font-size: 0.8rem; }
-        button { background: var(--primary); color: #0f172a; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
-        textarea { width: 100%; height: 150px; margin-top: 15px; background: #0f172a; color: white; border-radius: 8px; padding: 10px; }
+        :root { --bg: #020617; --card: #1e293b; --primary: #38bdf8; --accent: #f472b6; --text: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 3rem; color: var(--primary); margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card); border-radius: 20px; padding: 25px; border: 1px solid #334155; transition: 0.4s ease; text-align: left; position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        .card h3 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        input[type="file"] { width: 100%; margin: 15px 0; color: #94a3b8; font-size: 0.9rem; }
+        button { background: var(--primary); color: #020617; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        button:hover { opacity: 0.9; box-shadow: 0 0 15px var(--primary); }
+        .result-box { width: 100%; height: 150px; margin-top: 15px; background: #020617; border: 1px solid #334155; color: #38bdf8; border-radius: 10px; padding: 10px; font-size: 0.8rem; }
+        .error { color: #f87171; background: #450a0a; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <h1>MultiConvert Pro 🚀</h1>
+    <div class="header">
+        <h1>MegaConvert ⚡</h1>
+        <p>Hızlı, Sınırsız ve Tamamen Ücretsiz Dosya Dönüştürücü</p>
+    </div>
+
+    {% if error %} <div class="error">{{ error }}</div> {% endif %}
+
     <div class="grid">
-        <div class="tool-card">
+        <div class="card">
             <h3>📄 PDF -> Metin</h3>
+            <p>PDF'deki yazıları ayıkla.</p>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="pdf_to_text">
                 <input type="file" name="file" accept=".pdf" required>
-                <button type="submit">Dönüştür</button>
+                <button type="submit">Metne Çevir</button>
             </form>
-            {% if text %}
-            <textarea>{{ text }}</textarea>
-            {% endif %}
         </div>
 
-        <div class="tool-card">
+        <div class="card">
+            <h3>📝 Word -> Metin</h3>
+            <p>Docx dosyalarını metne dök.</p>
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="word_to_text">
+                <input type="file" name="file" accept=".docx" required>
+                <button type="submit">Metne Çevir</button>
+            </form>
+        </div>
+
+        <div class="card">
             <h3>🖼️ Resim -> PDF</h3>
+            <p>Görselleri PDF yap.</p>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="img_to_pdf">
                 <input type="file" name="file" accept="image/*" required>
-                <button type="submit">Dönüştür ve İndir</button>
+                <button type="submit">PDF Olarak İndir</button>
+            </form>
+        </div>
+
+        <div class="card" style="border-color: var(--accent);">
+            <h3 style="color: var(--accent);">🔄 Görsel -> PNG</h3>
+            <p>Herhangi bir resmi PNG yap.</p>
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="to_png">
+                <input type="file" name="file" accept="image/*" required>
+                <button type="submit" style="background: var(--accent);">PNG Olarak İndir</button>
             </form>
         </div>
     </div>
-    <p style="margin-top: 50px; color: #64748b;">Yeni araçlar yakında eklenecek...</p>
+
+    {% if text %}
+    <div style="max-width: 1200px; margin: 30px auto;">
+        <div class="card">
+            <h3>✅ İşlem Sonucu:</h3>
+            <textarea class="result-box">{{ text }}</textarea>
+            <p>Yukarıdaki metni kopyalayıp kullanabilirsiniz.</p>
+        </div>
+    </div>
+    {% endif %}
 </body>
 </html>
-
