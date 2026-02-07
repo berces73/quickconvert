@@ -1,16 +1,25 @@
-FROM python:3.10-slim
+# 1️⃣ Base image
+FROM node:18-alpine
 
+# 2️⃣ Çalışma dizini
 WORKDIR /app
 
-# Bağımlılıkları yükle
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# 3️⃣ Package dosyaları
+COPY package*.json ./
 
-# Tüm dosyaları kopyala
+# 4️⃣ Dependency yükle
+RUN npm install --production
+
+# 5️⃣ Tüm dosyaları kopyala
 COPY . .
 
-# Render için portu sabitle ve uygulamayı doğrudan başlat
-# gunicorn_config.py yerine doğrudan komut satırı kullanalım ki hata payı sıfırlansın
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+# 6️⃣ Render port
+ENV PORT=10000
+EXPOSE 10000
+
+# 7️⃣ Uygulamayı başlat
+CMD ["npm", "start"]
+]
+
 
 
