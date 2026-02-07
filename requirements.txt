@@ -4,5 +4,4 @@ gunicorn
 Pillow
 python-docx
 qrcode
-sumy
-nltk
+
