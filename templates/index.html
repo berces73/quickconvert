@@ -611,6 +611,75 @@
                 </form>
             </div>
 
+            <!-- QR Code Generator -->
+            <div class="tool-card">
+                <div class="tool-icon">🔗</div>
+                <h3>QR Kod Oluşturucu</h3>
+                <p>Link veya metniniz için profesyonel QR kodları oluşturun ve indirin.</p>
+                
+                <div class="features">
+                    <span class="feature-tag">📱 Taranabilir</span>
+                    <span class="feature-tag">💾 İndirilebilir</span>
+                </div>
+                
+                <form id="qr-form" onsubmit="generateQRCode(event)">
+                    <input type="text" id="qr-text" placeholder="Link veya metin girin..." required style="margin-top: 20px; background: var(--bg-secondary); color: var(--text-primary);">
+                    <select id="qr-size" style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border);">
+                        <option value="256">Küçük (256x256)</option>
+                        <option value="512" selected>Orta (512x512)</option>
+                        <option value="1024">Büyük (1024x1024)</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #ec4899, #f97316);">
+                        🔗 QR Oluştur
+                    </button>
+                </form>
+                <div id="qr-result" style="display:none; margin-top: 20px; text-align: center;"></div>
+            </div>
+
+            <!-- Image Compressor -->
+            <div class="tool-card">
+                <div class="tool-icon">🗜️</div>
+                <h3>Resim Sıkıştırıcı</h3>
+                <p>Resimleri kaliteden ödün vermeden küçültün. JPEG formatında kaydeder.</p>
+                
+                <div class="features">
+                    <span class="feature-tag">📉 Boyut Azalt</span>
+                    <span class="feature-tag">⚡ Hızlı İşlem</span>
+                </div>
+                
+                <form id="compress-form" onsubmit="compressImage(event)">
+                    <input type="file" id="compress-file" accept="image/*" required>
+                    <label style="color: var(--text-secondary); font-size: 0.9rem; display: block; margin-top: 15px;">
+                        Kalite: <span id="quality-value">80</span>%
+                    </label>
+                    <input type="range" id="quality-slider" min="10" max="100" value="80" 
+                           style="width: 100%; margin: 10px 0;"
+                           oninput="document.getElementById('quality-value').textContent = this.value">
+                    <button type="submit" class="btn btn-primary">
+                        🗜️ Sıkıştır ve İndir
+                    </button>
+                </form>
+            </div>
+
+            <!-- Image to PDF -->
+            <div class="tool-card">
+                <div class="tool-icon">🖼️</div>
+                <h3>Resimden PDF'e</h3>
+                <p>Resimlerinizi tek tıkla PDF formatına dönüştürün ve kaydedin.</p>
+                
+                <div class="features">
+                    <span class="feature-tag">📄 PDF Çıktı</span>
+                    <span class="feature-tag">🎨 Yüksek Kalite</span>
+                </div>
+                
+                <form id="img-to-pdf-form" onsubmit="imageToPDF(event)">
+                    <input type="file" id="img-to-pdf-file" accept="image/*" required>
+                    <button type="submit" class="btn btn-primary">
+                        🖼️ PDF Oluştur
+                    </button>
+                </form>
+            </div>
+
         </div>
 
         <!-- Error Display -->
@@ -679,8 +748,194 @@
             }, 2000);
         }
 
+        // Generate QR Code
+        async function generateQRCode(event) {
+            event.preventDefault();
+            
+            const text = document.getElementById('qr-text').value;
+            const size = document.getElementById('qr-size').value;
+            const resultDiv = document.getElementById('qr-result');
+            const form = document.getElementById('qr-form');
+            const btn = form.querySelector('button');
+            
+            // Show loading
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '⏳ Oluşturuluyor...';
+            btn.disabled = true;
+            
+            try {
+                const formData = new FormData();
+                formData.append('qr_text', text);
+                formData.append('qr_size', size);
+                
+                const response = await fetch('/generate-qr', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    
+                    resultDiv.innerHTML = `
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid var(--accent-green); border-radius: 16px; padding: 25px; animation: slideUp 0.5s ease;">
+                            <h4 style="color: var(--accent-green); margin-bottom: 15px;">✅ QR Kod Hazır!</h4>
+                            <img src="${url}" alt="QR Code" style="max-width: 300px; border-radius: 12px; margin: 15px 0; border: 1px solid var(--border);">
+                            <br>
+                            <a href="${url}" download="qr-code.png" class="btn" style="display: inline-block; width: auto; background: var(--accent-green); margin-top: 10px;">
+                                💾 QR Kodu İndir
+                            </a>
+                        </div>
+                    `;
+                    resultDiv.style.display = 'block';
+                    
+                    // Scroll to result
+                    setTimeout(() => {
+                        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                } else {
+                    const error = await response.json();
+                    alert('Hata: ' + (error.error || 'QR kod oluşturulamadı'));
+                }
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+        }
+
+        // Compress Image
+        async function compressImage(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('compress-file');
+            const quality = document.getElementById('quality-slider').value;
+            const form = document.getElementById('compress-form');
+            const btn = form.querySelector('button');
+            
+            if (!fileInput.files[0]) {
+                alert('Lütfen bir resim seçin');
+                return;
+            }
+            
+            // Show loading
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '⏳ Sıkıştırılıyor...';
+            btn.disabled = true;
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('quality', quality);
+                
+                const response = await fetch('/compress-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileInput.files[0].name.replace(/\.[^/.]+$/, '') + '_compressed.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    // Success message
+                    btn.innerHTML = '✅ İndiriliyor!';
+                    btn.style.background = 'var(--accent-green)';
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalBtnText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                        fileInput.value = '';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    alert('Hata: ' + (error.error || 'Sıkıştırma başarısız'));
+                    btn.innerHTML = originalBtnText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                alert('Hata: ' + error.message);
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+        }
+
+        // Image to PDF
+        async function imageToPDF(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('img-to-pdf-file');
+            const form = document.getElementById('img-to-pdf-form');
+            const btn = form.querySelector('button');
+            
+            if (!fileInput.files[0]) {
+                alert('Lütfen bir resim seçin');
+                return;
+            }
+            
+            // Show loading
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '⏳ PDF Oluşturuluyor...';
+            btn.disabled = true;
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                const response = await fetch('/image-to-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileInput.files[0].name.replace(/\.[^/.]+$/, '') + '.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    // Success message
+                    btn.innerHTML = '✅ PDF İndiriliyor!';
+                    btn.style.background = 'var(--accent-green)';
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalBtnText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                        fileInput.value = '';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    alert('Hata: ' + (error.error || 'PDF oluşturulamadı'));
+                    btn.innerHTML = originalBtnText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                alert('Hata: ' + error.message);
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+        }
+
         // Form submission animation
         document.querySelectorAll('form').forEach(form => {
+            // Skip forms with custom handlers
+            if (form.id === 'qr-form' || form.id === 'compress-form' || form.id === 'img-to-pdf-form') {
+                return;
+            }
+            
             form.addEventListener('submit', function(e) {
                 const btn = this.querySelector('button[type="submit"]');
                 const originalText = btn.innerHTML;
@@ -702,6 +957,7 @@
         {% endif %}
 
         console.log('🤖 Nexus Convert AI Edition aktif!');
+        console.log('✨ Tüm özellikler çalışıyor!');
     </script>
 </body>
 </html>
