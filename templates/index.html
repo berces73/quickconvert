@@ -3,38 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Tools - Hızlı ve Ücretsiz</title>
+    <title>PDF Expert Pro - Metin Dönüştürücü</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: var(--card); padding: 2rem; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 90%; max-width: 600px; text-align: center; border: 1px solid #334155; }
-        h1 { font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary); }
-        p { color: #94a3b8; margin-bottom: 2rem; }
-        .upload-area { border: 2px dashed #334155; padding: 2rem; border-radius: 15px; cursor: pointer; transition: 0.3s; }
-        .upload-area:hover { border-color: var(--primary); background: #1e293b; }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8; --secondary: #10b981; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { background: var(--card); padding: 2.5rem; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 700px; border: 1px solid #334155; }
+        h1 { font-size: 2.2rem; color: var(--primary); margin-top: 0; }
+        .upload-section { border: 2px dashed #334155; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; }
         input[type="file"] { margin: 1rem 0; color: #94a3b8; }
-        button { background: var(--primary); color: #0f172a; border: none; padding: 0.8rem 2rem; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; width: 100%; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.4); }
-        .footer { margin-top: 2rem; font-size: 0.8rem; color: #64748b; }
+        .btn-convert { background: var(--primary); color: #0f172a; border: none; padding: 1rem; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem; }
+        
+        .result-area { margin-top: 2rem; text-align: left; }
+        textarea { width: 100%; height: 200px; background: #0f172a; color: #cbd5e1; border: 1px solid #334155; border-radius: 10px; padding: 1rem; resize: vertical; margin-bottom: 1rem; }
+        .btn-download { background: var(--secondary); color: white; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+        
+        .footer { margin-top: 2rem; font-size: 0.85rem; color: #64748b; text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PDF Expert 🚀</h1>
-        <p>Dosyanızı seçin, metni saniyeler içinde ayıklayalım.</p>
-        
+        <h1>PDF Expert Pro 🚀</h1>
+        <p>Yüksek doğrulukla metin ayıklama aracı</p>
+
         <form method="post" enctype="multipart/form-data">
-            <div class="upload-area">
+            <div class="upload-section">
                 <input type="file" name="file" accept=".pdf" required>
+                <button type="submit" class="btn-convert">Dönüştürmeyi Başlat</button>
             </div>
-            <br>
-            <button type="submit">Dönüştürmeyi Başlat</button>
         </form>
 
+        {% if text %}
+        <div class="result-area">
+            <h3>Dönüştürülen Metin:</h3>
+            <textarea id="outputText">{{ text }}</textarea>
+            <button onclick="downloadText()" class="btn-download">📄 Metni .txt Olarak İndir</button>
+        </div>
+        {% endif %}
+
         <div class="footer">
-            🔒 Gizlilik Önceliğimizdir: Dosyalar işlendikten sonra anında silinir.
+            🔒 Gizlilik: Dosyalarınız hiçbir yerde saklanmaz.
         </div>
     </div>
+
+    <script>
+        function downloadText() {
+            const text = document.getElementById('outputText').value;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pdf-export.txt';
+            a.click();
+        }
+    </script>
 </body>
 </html>
+
 
