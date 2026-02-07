@@ -3,51 +3,1244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus AI | Akıllı Belge Merkezi</title>
+    <title>Nexus Convert | Ultimate Edition</title>
     <style>
-        :root { --bg: #05070a; --primary: #38bdf8; --purple: #a855f7; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 50px auto; }
-        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; margin-bottom: 20px; transition: 0.3s; }
-        .card:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); }
-        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-ai { background: linear-gradient(90deg, var(--primary), var(--purple)); color: white; }
-        .btn-text { background: #1f2937; color: white; }
-        textarea { width: 100%; height: 200px; background: #000; color: var(--primary); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-top: 20px; }
-        .badge { background: var(--primary); color: black; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: rgba(139, 92, 246, 0.15);
+            --shadow: 0 20px 60px rgba(139, 92, 246, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, 100px) rotate(90deg); }
+            50% { transform: translate(200px, 50px) rotate(180deg); }
+            75% { transform: translate(100px, -50px) rotate(270deg); }
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(26, 26, 36, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .nav-stats {
+            display: flex;
+            gap: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-number {
+            color: var(--accent-purple);
+            font-weight: 700;
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 60px auto 40px;
+            padding: 0 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* Tool Cards */
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 35px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+        }
+
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .tool-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .tool-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        /* File Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(139, 92, 246, 0.02);
+            margin: 20px 0;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Selected File Display */
+        .selected-file {
+            display: none;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--accent-purple);
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .selected-file.active {
+            display: flex;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .file-size {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .remove-file {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remove-file:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Input Fields */
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        .spinner.active {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Result Box */
+        .result-box {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-purple);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-box h3 {
+            color: var(--accent-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        /* Download Preview */
+        .download-preview {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-green);
+            border-radius: 20px;
+            margin-top: 30px;
+        }
+
+        .download-preview.active {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        .download-preview img,
+        .download-preview canvas {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            display: none;
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            min-width: 300px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-color: var(--accent-green);
+        }
+
+        .toast.error {
+            border-color: #ef4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-content {
+                padding: 0 20px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .nav-stats {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 style="text-align:center; font-size: 3rem; margin-bottom: 10px;">Nexus AI ⚡</h1>
-        <p style="text-align:center; color: #666; margin-bottom: 40px;">Hızlı, stabil ve profesyonel belge analiz sistemi.</p>
+    <div class="bg-animation"></div>
 
-        <div class="card">
-            <span class="badge">PRO PANEL</span>
-            <h3>Belge Yükle (PDF veya Word)</h3>
-            <form method="post" enctype="multipart/form-data">
-                <input type="file" name="file" style="margin: 20px 0; display: block;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <button type="submit" name="action" value="ai_analyze" class="btn btn-ai">✨ AI İle Özetle</button>
-                    <button type="submit" name="action" value="just_text" class="btn btn-text">📄 Metne Çevir</button>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">NEXUS CONVERT</div>
+            <div class="nav-stats">
+                <div class="stat-item">
+                    <span>⚡</span>
+                    <span><span class="stat-number" id="fileCount">0</span> dosya işlendi</span>
                 </div>
-            </form>
+                <div class="stat-item">
+                    <span>🚀</span>
+                    <span>v3.0 Ultimate</span>
+                </div>
+            </div>
         </div>
+    </nav>
 
-        {% if ai_result %}
-        <div class="card" style="border-color: var(--purple);">
-            <h3 style="color: var(--purple);">✨ Yapay Zeka Özeti</h3>
-            <p style="line-height: 1.6; color: #ddd;">{{ ai_result }}</p>
-        </div>
-        {% endif %}
-
-        {% if text %}
-        <div class="card">
-            <h3>📄 Belge Metni</h3>
-            <textarea readonly>{{ text }}</textarea>
-        </div>
-        {% endif %}
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Dosya Dönüştürme Merkezi</h1>
+        <p>PDF, Word, resim ve daha fazlasını anında dönüştürün. Modern, hızlı ve tamamen ücretsiz.</p>
     </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="tools-grid">
+            
+            <!-- PDF to Text -->
+            <div class="tool-card">
+                <div class="tool-icon">📄</div>
+                <h3>PDF'den Metne</h3>
+                <p>PDF dosyalarınızı düzenlenebilir metne dönüştürün</p>
+                
+                <div class="upload-area" onclick="document.getElementById('pdf-file').click()" 
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event, 'pdf-file')">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">PDF dosyası seçin veya sürükleyin</div>
+                </div>
+                <input type="file" id="pdf-file" class="file-input" accept=".pdf" onchange="handleFileSelect(event, 'pdf')">
+                
+                <div class="selected-file" id="pdf-selected">
+                    <span>📄</span>
+                    <div class="file-info">
+                        <div class="file-name" id="pdf-name"></div>
+                        <div class="file-size" id="pdf-size"></div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile('pdf')">✕</button>
+                </div>
+                
+                <div class="progress-bar" id="pdf-progress">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="convertPDFToText()" id="pdf-btn">
+                    <span id="pdf-btn-text">Dönüştür</span>
+                    <div class="spinner" id="pdf-spinner"></div>
+                </button>
+            </div>
+
+            <!-- Word to Text -->
+            <div class="tool-card">
+                <div class="tool-icon">📝</div>
+                <h3>Word'den Metne</h3>
+                <p>DOCX dosyalarınızı düz metne çevirin</p>
+                
+                <div class="upload-area" onclick="document.getElementById('word-file').click()"
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event, 'word-file')">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Word dosyası seçin veya sürükleyin</div>
+                </div>
+                <input type="file" id="word-file" class="file-input" accept=".doc,.docx" onchange="handleFileSelect(event, 'word')">
+                
+                <div class="selected-file" id="word-selected">
+                    <span>📝</span>
+                    <div class="file-info">
+                        <div class="file-name" id="word-name"></div>
+                        <div class="file-size" id="word-size"></div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile('word')">✕</button>
+                </div>
+                
+                <div class="progress-bar" id="word-progress">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="convertWordToText()" id="word-btn">
+                    <span id="word-btn-text">Dönüştür</span>
+                    <div class="spinner" id="word-spinner"></div>
+                </button>
+            </div>
+
+            <!-- Text to QR -->
+            <div class="tool-card">
+                <div class="tool-icon">🔗</div>
+                <h3>Metinden QR Koda</h3>
+                <p>Link veya metniniz için QR kodu oluşturun</p>
+                
+                <input type="text" id="qr-text" placeholder="Link veya metin girin..." style="margin-top: 20px;">
+                
+                <select id="qr-size">
+                    <option value="256">Küçük (256x256)</option>
+                    <option value="512" selected>Orta (512x512)</option>
+                    <option value="1024">Büyük (1024x1024)</option>
+                </select>
+                
+                <button class="btn btn-primary" onclick="generateQR()" style="background: linear-gradient(135deg, #ec4899, #f97316);">
+                    <span id="qr-btn-text">QR Oluştur</span>
+                    <div class="spinner" id="qr-spinner"></div>
+                </button>
+            </div>
+
+            <!-- Image to PDF -->
+            <div class="tool-card">
+                <div class="tool-icon">🖼️</div>
+                <h3>Resimden PDF'e</h3>
+                <p>Resimlerinizi PDF formatına dönüştürün</p>
+                
+                <div class="upload-area" onclick="document.getElementById('img-file').click()"
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event, 'img-file')">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Resim dosyası seçin veya sürükleyin</div>
+                </div>
+                <input type="file" id="img-file" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'img')">
+                
+                <div class="selected-file" id="img-selected">
+                    <span>🖼️</span>
+                    <div class="file-info">
+                        <div class="file-name" id="img-name"></div>
+                        <div class="file-size" id="img-size"></div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile('img')">✕</button>
+                </div>
+                
+                <button class="btn btn-primary" onclick="convertImageToPDF()" id="img-btn">
+                    <span id="img-btn-text">PDF Oluştur</span>
+                    <div class="spinner" id="img-spinner"></div>
+                </button>
+            </div>
+
+            <!-- Image Compressor -->
+            <div class="tool-card">
+                <div class="tool-icon">🗜️</div>
+                <h3>Resim Sıkıştırıcı</h3>
+                <p>Resimleri kaliteden ödün vermeden küçültün</p>
+                
+                <div class="upload-area" onclick="document.getElementById('compress-file').click()"
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event, 'compress-file')">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Resim dosyası seçin veya sürükleyin</div>
+                </div>
+                <input type="file" id="compress-file" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'compress')">
+                
+                <div class="selected-file" id="compress-selected">
+                    <span>🗜️</span>
+                    <div class="file-info">
+                        <div class="file-name" id="compress-name"></div>
+                        <div class="file-size" id="compress-size"></div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile('compress')">✕</button>
+                </div>
+                
+                <label style="color: var(--text-secondary); font-size: 0.9rem; display: block; margin-top: 15px;">
+                    Kalite: <span id="quality-value">80</span>%
+                </label>
+                <input type="range" id="quality-slider" min="10" max="100" value="80" 
+                       style="width: 100%; margin: 10px 0;"
+                       oninput="document.getElementById('quality-value').textContent = this.value">
+                
+                <button class="btn btn-primary" onclick="compressImage()" id="compress-btn">
+                    <span id="compress-btn-text">Sıkıştır</span>
+                    <div class="spinner" id="compress-spinner"></div>
+                </button>
+            </div>
+
+            <!-- Excel to JSON -->
+            <div class="tool-card">
+                <div class="tool-icon">📊</div>
+                <h3>Excel'den JSON'a</h3>
+                <p>Excel tablolarınızı JSON formatına dönüştürün</p>
+                
+                <div class="upload-area" onclick="document.getElementById('excel-file').click()"
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event, 'excel-file')">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Excel dosyası seçin veya sürükleyin</div>
+                </div>
+                <input type="file" id="excel-file" class="file-input" accept=".xlsx,.xls" onchange="handleFileSelect(event, 'excel')">
+                
+                <div class="selected-file" id="excel-selected">
+                    <span>📊</span>
+                    <div class="file-info">
+                        <div class="file-name" id="excel-name"></div>
+                        <div class="file-size" id="excel-size"></div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile('excel')">✕</button>
+                </div>
+                
+                <button class="btn btn-primary" onclick="convertExcelToJSON()" id="excel-btn">
+                    <span id="excel-btn-text">Dönüştür</span>
+                    <div class="spinner" id="excel-spinner"></div>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Result Display Area -->
+        <div id="result-area"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toast-icon">✓</span>
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        // Global variables
+        let fileCount = 0;
+        const files = {};
+
+        // PDF.js worker setup
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // File handling functions
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e, inputId) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                document.getElementById(inputId).files = e.dataTransfer.files;
+                handleFileSelect({ target: { files: [file] } }, inputId.split('-')[0]);
+            }
+        }
+
+        function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            files[type] = file;
+            
+            const name = document.getElementById(`${type}-name`);
+            const size = document.getElementById(`${type}-size`);
+            const selected = document.getElementById(`${type}-selected`);
+            
+            name.textContent = file.name;
+            size.textContent = formatFileSize(file.size);
+            selected.classList.add('active');
+        }
+
+        function removeFile(type) {
+            files[type] = null;
+            document.getElementById(`${type}-file`).value = '';
+            document.getElementById(`${type}-selected`).classList.remove('active');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+            
+            toast.className = `toast ${type}`;
+            icon.textContent = type === 'success' ? '✓' : '✕';
+            msg.textContent = message;
+            
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+
+        // Update file count
+        function updateFileCount() {
+            fileCount++;
+            document.getElementById('fileCount').textContent = fileCount;
+        }
+
+        // Progress bar
+        function showProgress(type, show = true) {
+            const progress = document.getElementById(`${type}-progress`);
+            if (show) {
+                progress.classList.add('active');
+                simulateProgress(type);
+            } else {
+                progress.classList.remove('active');
+            }
+        }
+
+        function simulateProgress(type) {
+            const fill = document.querySelector(`#${type}-progress .progress-fill`);
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 90) {
+                    clearInterval(interval);
+                } else {
+                    width += Math.random() * 20;
+                    fill.style.width = Math.min(width, 90) + '%';
+                }
+            }, 200);
+        }
+
+        function completeProgress(type) {
+            const fill = document.querySelector(`#${type}-progress .progress-fill`);
+            fill.style.width = '100%';
+            setTimeout(() => showProgress(type, false), 500);
+        }
+
+        // Button loading state
+        function setLoading(type, loading) {
+            const btn = document.getElementById(`${type}-btn`);
+            const text = document.getElementById(`${type}-btn-text`);
+            const spinner = document.getElementById(`${type}-spinner`);
+            
+            btn.disabled = loading;
+            text.style.display = loading ? 'none' : 'inline';
+            spinner.classList.toggle('active', loading);
+        }
+
+        // PDF to Text
+        async function convertPDFToText() {
+            const file = files.pdf;
+            if (!file) {
+                showToast('Lütfen bir PDF dosyası seçin', 'error');
+                return;
+            }
+
+            setLoading('pdf', true);
+            showProgress('pdf');
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const text = content.items.map(item => item.str).join(' ');
+                    fullText += `\n\n--- Sayfa ${i} ---\n\n${text}`;
+                }
+
+                completeProgress('pdf');
+                displayResult('PDF Metni', fullText, 'text');
+                updateFileCount();
+                showToast('PDF başarıyla dönüştürüldü!');
+            } catch (error) {
+                showToast('PDF dönüştürme hatası: ' + error.message, 'error');
+            } finally {
+                setLoading('pdf', false);
+            }
+        }
+
+        // Word to Text
+        async function convertWordToText() {
+            const file = files.word;
+            if (!file) {
+                showToast('Lütfen bir Word dosyası seçin', 'error');
+                return;
+            }
+
+            setLoading('word', true);
+            showProgress('word');
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                
+                completeProgress('word');
+                displayResult('Word Metni', result.value, 'text');
+                updateFileCount();
+                showToast('Word dosyası başarıyla dönüştürüldü!');
+            } catch (error) {
+                showToast('Word dönüştürme hatası: ' + error.message, 'error');
+            } finally {
+                setLoading('word', false);
+            }
+        }
+
+        // Generate QR Code
+        function generateQR() {
+            const text = document.getElementById('qr-text').value.trim();
+            const size = parseInt(document.getElementById('qr-size').value);
+
+            if (!text) {
+                showToast('Lütfen bir metin veya link girin', 'error');
+                return;
+            }
+
+            setLoading('qr', true);
+
+            setTimeout(() => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    QRCode.toCanvas(canvas, text, {
+                        width: size,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#ffffff'
+                        }
+                    }, (error) => {
+                        if (error) {
+                            showToast('QR kod oluşturma hatası', 'error');
+                            setLoading('qr', false);
+                            return;
+                        }
+
+                        displayResult('QR Kod', null, 'qr', canvas);
+                        updateFileCount();
+                        showToast('QR kod başarıyla oluşturuldu!');
+                        setLoading('qr', false);
+                    });
+                } catch (error) {
+                    showToast('QR kod hatası: ' + error.message, 'error');
+                    setLoading('qr', false);
+                }
+            }, 500);
+        }
+
+        // Image to PDF
+        async function convertImageToPDF() {
+            const file = files.img;
+            if (!file) {
+                showToast('Lütfen bir resim dosyası seçin', 'error');
+                return;
+            }
+
+            setLoading('img', true);
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                
+                const img = await loadImage(file);
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                const ratio = Math.min(pdfWidth / img.width, pdfHeight / img.height);
+                const width = img.width * ratio;
+                const height = img.height * ratio;
+                
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
+                
+                pdf.save(file.name.replace(/\.[^/.]+$/, '') + '.pdf');
+                
+                updateFileCount();
+                showToast('PDF başarıyla oluşturuldu!');
+            } catch (error) {
+                showToast('PDF oluşturma hatası: ' + error.message, 'error');
+            } finally {
+                setLoading('img', false);
+            }
+        }
+
+        // Compress Image
+        async function compressImage() {
+            const file = files.compress;
+            if (!file) {
+                showToast('Lütfen bir resim dosyası seçin', 'error');
+                return;
+            }
+
+            setLoading('compress', true);
+
+            try {
+                const quality = document.getElementById('quality-slider').value / 100;
+                const img = await loadImage(file);
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                    const originalSize = file.size;
+                    const newSize = blob.size;
+                    const reduction = ((1 - newSize / originalSize) * 100).toFixed(1);
+                    
+                    displayResult('Sıkıştırılmış Resim', null, 'compress', canvas, {
+                        original: formatFileSize(originalSize),
+                        compressed: formatFileSize(newSize),
+                        reduction: reduction
+                    });
+                    
+                    updateFileCount();
+                    showToast(`Resim %${reduction} küçültüldü!`);
+                    setLoading('compress', false);
+                }, 'image/jpeg', quality);
+                
+            } catch (error) {
+                showToast('Sıkıştırma hatası: ' + error.message, 'error');
+                setLoading('compress', false);
+            }
+        }
+
+        // Excel to JSON
+        async function convertExcelToJSON() {
+            const file = files.excel;
+            if (!file) {
+                showToast('Lütfen bir Excel dosyası seçin', 'error');
+                return;
+            }
+
+            setLoading('excel', true);
+            showProgress('excel');
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+                
+                const jsonString = JSON.stringify(json, null, 2);
+                
+                completeProgress('excel');
+                displayResult('JSON Verisi', jsonString, 'text');
+                updateFileCount();
+                showToast('Excel başarıyla JSON\'a dönüştürüldü!');
+            } catch (error) {
+                showToast('Excel dönüştürme hatası: ' + error.message, 'error');
+            } finally {
+                setLoading('excel', false);
+            }
+        }
+
+        // Helper: Load Image
+        function loadImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Display Results
+        function displayResult(title, text, type, canvas = null, meta = null) {
+            const resultArea = document.getElementById('result-area');
+            
+            if (type === 'text') {
+                resultArea.innerHTML = `
+                    <div class="result-box">
+                        <h3>📝 ${title}</h3>
+                        <textarea readonly>${text}</textarea>
+                        <button class="btn btn-primary" onclick="copyToClipboard(this)" style="margin-top: 15px;">
+                            📋 Panoya Kopyala
+                        </button>
+                        <button class="btn btn-primary" onclick="downloadText('${title}')" style="margin-top: 15px; background: var(--accent-green);">
+                            💾 TXT Olarak İndir
+                        </button>
+                    </div>
+                `;
+            } else if (type === 'qr') {
+                const dataUrl = canvas.toDataURL();
+                resultArea.innerHTML = `
+                    <div class="download-preview active">
+                        <h3>✅ QR Kod Hazır!</h3>
+                        <canvas id="qr-canvas" style="display:none;"></canvas>
+                        <img src="${dataUrl}" alt="QR Code">
+                        <br><br>
+                        <a href="${dataUrl}" download="qr-code.png" class="download-btn">
+                            💾 QR Kodu İndir
+                        </a>
+                    </div>
+                `;
+                const displayCanvas = document.getElementById('qr-canvas');
+                displayCanvas.width = canvas.width;
+                displayCanvas.height = canvas.height;
+                displayCanvas.getContext('2d').drawImage(canvas, 0, 0);
+            } else if (type === 'compress') {
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                resultArea.innerHTML = `
+                    <div class="download-preview active">
+                        <h3>✅ Resim Sıkıştırıldı!</h3>
+                        <p style="color: var(--text-secondary); margin: 10px 0;">
+                            Orijinal: ${meta.original} → Yeni: ${meta.compressed} 
+                            <span style="color: var(--accent-green); font-weight: bold;">(↓ %${meta.reduction})</span>
+                        </p>
+                        <img src="${dataUrl}" alt="Compressed Image">
+                        <br><br>
+                        <a href="${dataUrl}" download="compressed-image.jpg" class="download-btn">
+                            💾 Sıkıştırılmış Resmi İndir
+                        </a>
+                    </div>
+                `;
+            }
+            
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(btn) {
+            const textarea = btn.parentElement.querySelector('textarea');
+            textarea.select();
+            document.execCommand('copy');
+            
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Kopyalandı!';
+            setTimeout(() => btn.textContent = originalText, 2000);
+            
+            showToast('Metin panoya kopyalandı!');
+        }
+
+        // Download text
+        function downloadText(filename) {
+            const textarea = document.querySelector('.result-box textarea');
+            const blob = new Blob([textarea.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename.toLowerCase().replace(/\s+/g, '-') + '.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Dosya indiriliyor!');
+        }
+
+        // Initialize
+        console.log('🚀 Nexus Convert Ultimate v3.0 başlatıldı');
+    </script>
 </body>
 </html>
+
 
