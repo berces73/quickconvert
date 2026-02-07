@@ -3,33 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ücretsiz PDF - Metin Dönüştürücü</title>
+    <title>PDF Tools - Hızlı ve Ücretsiz</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f4f7f6; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-block; max-width: 500px; }
-        h1 { color: #2c3e50; }
-        input[type="file"] { margin: 20px 0; }
-        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #2980b9; }
-        .footer-text { margin-top: 40px; color: #7f8c8d; font-size: 14px; line-height: 1.6; }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #38bdf8; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: var(--card); padding: 2rem; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 90%; max-width: 600px; text-align: center; border: 1px solid #334155; }
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary); }
+        p { color: #94a3b8; margin-bottom: 2rem; }
+        .upload-area { border: 2px dashed #334155; padding: 2rem; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .upload-area:hover { border-color: var(--primary); background: #1e293b; }
+        input[type="file"] { margin: 1rem 0; color: #94a3b8; }
+        button { background: var(--primary); color: #0f172a; border: none; padding: 0.8rem 2rem; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; width: 100%; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.4); }
+        .footer { margin-top: 2rem; font-size: 0.8rem; color: #64748b; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PDF'i Metne Çevir</h1>
-        <p>Hızlı, ücretsiz ve güvenli dönüşüm.</p>
+        <h1>PDF Expert 🚀</h1>
+        <p>Dosyanızı seçin, metni saniyeler içinde ayıklayalım.</p>
         
         <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".pdf" required>
+            <div class="upload-area">
+                <input type="file" name="file" accept=".pdf" required>
+            </div>
             <br>
-            <button type="submit">Hemen Dönüştür</button>
+            <button type="submit">Dönüştürmeyi Başlat</button>
         </form>
-    </div>
 
-    <div class="footer-text">
-        <h3>Neden Bu Aracı Kullanmalısınız?</h3>
-        <p>PDF dosyalarınızı metne çevirmek artık çok kolay. Sunucularımızda dosya saklamıyoruz, <br> 
-        tamamen gizlilik odaklı çalışıyoruz. Hemen PDF yükleyerek TXT formatında çıktı alabilirsiniz.</p>
+        <div class="footer">
+            🔒 Gizlilik Önceliğimizdir: Dosyalar işlendikten sonra anında silinir.
+        </div>
     </div>
 </body>
 </html>
+
