@@ -2,10 +2,18 @@ import os
 from flask import Flask, render_template, request, send_file, jsonify
 import pdfplumber
 from docx import Document
+import qrcode
+from PIL import Image
 import io
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Upload folder for temporary files
+UPLOAD_FOLDER = 'temp_uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 def simple_ai_summary(text):
     """
@@ -152,6 +160,123 @@ def health():
     return jsonify({"status": "healthy", "version": "3.0-AI"})
 
 
+@app.route('/generate-qr', methods=['POST'])
+def generate_qr():
+    """QR kod oluşturma endpoint'i"""
+    try:
+        qr_text = request.form.get('qr_text', '').strip()
+        qr_size = int(request.form.get('qr_size', 512))
+        
+        if not qr_text:
+            return jsonify({"error": "Lütfen bir metin veya link girin"}), 400
+        
+        # QR kod oluştur
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(qr_text)
+        qr.make(fit=True)
+        
+        # Resim oluştur
+        img = qr.make_image(fill_color="black", back_color="white")
+        img = img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
+        
+        # Byte buffer'a kaydet
+        img_io = io.BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        
+        return send_file(
+            img_io,
+            mimetype='image/png',
+            as_attachment=True,
+            download_name=f'qr-code-{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
+        )
+        
+    except Exception as e:
+        return jsonify({"error": f"QR kod oluşturma hatası: {str(e)}"}), 500
+
+
+@app.route('/compress-image', methods=['POST'])
+def compress_image():
+    """Resim sıkıştırma endpoint'i"""
+    try:
+        file = request.files.get('file')
+        quality = int(request.form.get('quality', 80))
+        
+        if not file:
+            return jsonify({"error": "Lütfen bir resim dosyası seçin"}), 400
+        
+        # Resmi aç
+        img = Image.open(file.stream)
+        
+        # RGB'ye çevir (RGBA ise)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = background
+        
+        # Sıkıştır
+        img_io = io.BytesIO()
+        img.save(img_io, format='JPEG', quality=quality, optimize=True)
+        img_io.seek(0)
+        
+        original_filename = file.filename.rsplit('.', 1)[0]
+        
+        return send_file(
+            img_io,
+            mimetype='image/jpeg',
+            as_attachment=True,
+            download_name=f'{original_filename}_compressed.jpg'
+        )
+        
+    except Exception as e:
+        return jsonify({"error": f"Sıkıştırma hatası: {str(e)}"}), 500
+
+
+@app.route('/image-to-pdf', methods=['POST'])
+def image_to_pdf():
+    """Resimden PDF oluşturma endpoint'i"""
+    try:
+        file = request.files.get('file')
+        
+        if not file:
+            return jsonify({"error": "Lütfen bir resim dosyası seçin"}), 400
+        
+        # Resmi aç
+        img = Image.open(file.stream)
+        
+        # RGB'ye çevir
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = background
+        
+        # PDF'e kaydet
+        pdf_io = io.BytesIO()
+        img.save(pdf_io, format='PDF')
+        pdf_io.seek(0)
+        
+        original_filename = file.filename.rsplit('.', 1)[0]
+        
+        return send_file(
+            pdf_io,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=f'{original_filename}.pdf'
+        )
+        
+    except Exception as e:
+        return jsonify({"error": f"PDF oluşturma hatası: {str(e)}"}), 500
+
+
 @app.errorhandler(413)
 def too_large(e):
     """Dosya boyutu çok büyükse"""
@@ -176,8 +301,3 @@ if __name__ == '__main__':
     print("🤖 AI Özet özelliği aktif!")
     
     app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-
-
-
