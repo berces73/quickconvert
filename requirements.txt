@@ -3,3 +3,4 @@ pdfplumber
 gunicorn
 Pillow
 python-docx
+qrcode
