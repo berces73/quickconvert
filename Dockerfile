@@ -1,25 +1,18 @@
-# 1️⃣ Base image
-FROM node:18-alpine
+FROM node:18
 
-# 2️⃣ Çalışma dizini
 WORKDIR /app
 
-# 3️⃣ Package dosyaları
-COPY package*.json ./
+COPY package.json package-lock.json* ./
 
-# 4️⃣ Dependency yükle
-RUN npm install --production
+RUN npm install
 
-# 5️⃣ Tüm dosyaları kopyala
 COPY . .
 
-# 6️⃣ Render port
 ENV PORT=10000
 EXPOSE 10000
 
-# 7️⃣ Uygulamayı başlat
-CMD ["npm", "start"]
-]
+CMD ["node", "index.js"]
+
 
 
 
