@@ -20,4 +20,5 @@ COPY . .
 EXPOSE 5000
 
 # 7. Aşama: Gunicorn ile uygulamayı başlat
+
 CMD ["gunicorn", "--config", "gunicorn_config.py", "app:app"]
