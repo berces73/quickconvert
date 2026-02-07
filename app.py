@@ -1,303 +1,198 @@
-import os
-from flask import Flask, render_template, request, send_file, jsonify
-import pdfplumber
-from docx import Document
-import qrcode
-from PIL import Image
+# -*- coding: utf-8 -*-
+"""
+Nexus Convert | AI Edition - Flask backend
+"""
 import io
-from datetime import datetime
+import os
+import re
+from pathlib import Path
+
+from flask import Flask, render_template, request, send_file, jsonify
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-
-# Upload folder for temporary files
-UPLOAD_FOLDER = 'temp_uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-def simple_ai_summary(text):
-    """
-    Gelişmiş AI Özetleme Fonksiyonu
-    Metnin en önemli kısımlarını akıllıca seçer
-    """
-    if not text or len(text) < 50:
-        return "⚠️ Özetlemek için yeterli metin bulunamadı."
-    
-    # Metni temizle
-    text = text.strip()
-    
-    # Cümlelere ayır ve temizle
-    sentences = []
-    for s in text.replace('\n', ' ').split('.'):
-        s = s.strip()
-        if len(s) > 30:  # Çok kısa cümleleri atla
-            sentences.append(s)
-    
-    if not sentences:
-        return "⚠️ Geçerli cümle bulunamadı."
-    
-    # Özetleme stratejisi
-    num_sentences = len(sentences)
-    
-    if num_sentences <= 3:
-        # Çok kısa metinler için tamamını döndür
-        return '. '.join(sentences) + '.'
-    
-    elif num_sentences <= 10:
-        # Orta uzunlukta metinler için başlangıç, orta ve son
-        summary_parts = [
-            sentences[0],
-            sentences[num_sentences // 2],
-            sentences[-1]
-        ]
-        return '. '.join(summary_parts) + '.'
-    
-    else:
-        # Uzun metinler için daha kapsamlı özet
-        # İlk paragraf, ortadan birkaç önemli cümle, sonuç
-        summary_parts = [
-            sentences[0],  # Giriş
-            sentences[num_sentences // 4],  # İlk çeyrek
-            sentences[num_sentences // 2],  # Orta
-            sentences[3 * num_sentences // 4],  # Son çeyrek
-            sentences[-1]  # Sonuç
-        ]
-        
-        # Benzer cümleleri temizle
-        unique_parts = []
-        for part in summary_parts:
-            if part not in unique_parts:
-                unique_parts.append(part)
-        
-        summary = '. '.join(unique_parts) + '.'
-        
-        # Özet çok uzunsa kısalt
-        if len(summary) > 500:
-            summary = summary[:497] + '...'
-        
-        return summary
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50 MB
+UPLOAD_FOLDER = Path(app.root_path) / "uploads"
+UPLOAD_FOLDER.mkdir(exist_ok=True)
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    """Ana sayfa ve dosya işleme"""
-    ai_result = None
-    text_result = None
-    error = None
-    
-    if request.method == 'POST':
-        action = request.form.get('action')
-        file = request.files.get('file')
-        
-        if not file:
-            error = "Lütfen bir dosya seçin."
-            return render_template('index.html', error=error)
-        
-        try:
-            content = ""
-            filename = file.filename.lower()
-            
-            # PDF İşleme
-            if filename.endswith('.pdf'):
-                try:
-                    with pdfplumber.open(file) as pdf:
-                        pages_text = []
-                        for i, page in enumerate(pdf.pages, 1):
-                            page_text = page.extract_text()
-                            if page_text:
-                                pages_text.append(f"[Sayfa {i}]\n{page_text}")
-                        content = "\n\n".join(pages_text)
-                    
-                    if not content.strip():
-                        error = "PDF'den metin çıkarılamadı. Dosya metin içermiyor olabilir."
-                        return render_template('index.html', error=error)
-                        
-                except Exception as e:
-                    error = f"PDF okuma hatası: {str(e)}"
-                    return render_template('index.html', error=error)
-            
-            # Word İşleme
-            elif filename.endswith('.docx') or filename.endswith('.doc'):
-                try:
-                    doc = Document(file)
-                    paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
-                    content = "\n\n".join(paragraphs)
-                    
-                    if not content.strip():
-                        error = "Word dosyasından metin çıkarılamadı."
-                        return render_template('index.html', error=error)
-                        
-                except Exception as e:
-                    error = f"Word okuma hatası: {str(e)}"
-                    return render_template('index.html', error=error)
-            
-            else:
-                error = "Desteklenmeyen dosya formatı. Lütfen PDF veya DOCX dosyası yükleyin."
-                return render_template('index.html', error=error)
-            
-            # İşlem türüne göre sonuç
-            if action == 'ai_analyze':
-                ai_result = simple_ai_summary(content)
-                # Tam metni de göster (isteğe bağlı)
-                # text_result = content
-                
-            else:  # pdf_to_text veya word_to_text
-                text_result = content
-                
-        except Exception as e:
-            error = f"Dosya işlenirken bir hata oluştu: {str(e)}"
-            return render_template('index.html', error=error)
-    
-    return render_template('index.html', 
-                         ai_result=ai_result, 
-                         text=text_result, 
-                         error=error)
-
-
-@app.route('/health')
-def health():
-    """Sağlık kontrol endpoint'i"""
-    return jsonify({"status": "healthy", "version": "3.0-AI"})
-
-
-@app.route('/generate-qr', methods=['POST'])
-def generate_qr():
-    """QR kod oluşturma endpoint'i"""
+def extract_text_from_pdf(file_bytes):
     try:
-        qr_text = request.form.get('qr_text', '').strip()
-        qr_size = int(request.form.get('qr_size', 512))
-        
+        import PyPDF2
+        reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+        parts = []
+        for page in reader.pages:
+            parts.append(page.extract_text() or "")
+        return "\n\n".join(parts).strip()
+    except Exception as e:
+        raise ValueError(f"PDF okunamadı: {e}")
+
+
+def extract_text_from_docx(file_bytes):
+    try:
+        from docx import Document
+        doc = Document(io.BytesIO(file_bytes))
+        return "\n\n".join(p.text for p in doc.paragraphs).strip()
+    except Exception as e:
+        raise ValueError(f"Word dosyası okunamadı: {e}")
+
+
+def simple_summarize(text, max_sentences=8):
+    """Basit metin özeti: ilk paragraflar ve anahtar cümleler."""
+    if not text or len(text) < 200:
+        return text[:1500] if text else "Özet çıkarılamadı."
+    # İlk birkaç paragraf
+    paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+    taken = []
+    total_len = 0
+    for p in paragraphs:
+        if total_len > 1200:
+            break
+        taken.append(p)
+        total_len += len(p) + 2
+    result = "\n\n".join(taken)
+    if len(result) < 400 and len(paragraphs) > len(taken):
+        for p in paragraphs[len(taken) : len(taken) + 3]:
+            if total_len > 1500:
+                break
+            taken.append(p)
+            total_len += len(p) + 2
+        result = "\n\n".join(taken)
+    return result[:2000] + ("..." if len(result) > 2000 else "")
+
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    error = None
+    ai_result = None
+    text = None
+
+    if request.method == "POST":
+        action = request.form.get("action")
+        file = request.files.get("file")
+
+        if not file or file.filename == "":
+            error = "Lütfen bir dosya seçin."
+            return render_template("index.html", error=error, ai_result=ai_result, text=text)
+
+        try:
+            raw = file.read()
+        except Exception as e:
+            error = f"Dosya okunamadı: {e}"
+            return render_template("index.html", error=error, ai_result=ai_result, text=text)
+
+        if action == "ai_analyze":
+            ext = (Path(file.filename).suffix or "").lower()
+            if ext == ".pdf":
+                full_text = extract_text_from_pdf(raw)
+            elif ext in (".doc", ".docx"):
+                full_text = extract_text_from_docx(raw)
+            else:
+                error = "Sadece PDF veya Word (.docx) destekleniyor."
+                return render_template("index.html", error=error, ai_result=ai_result, text=text)
+            ai_result = simple_summarize(full_text)
+            return render_template("index.html", error=error, ai_result=ai_result, text=text)
+
+        if action == "pdf_to_text":
+            try:
+                text = extract_text_from_pdf(raw)
+            except ValueError as e:
+                error = str(e)
+            else:
+                return render_template("index.html", error=error, ai_result=ai_result, text=text or "(Metin bulunamadı)")
+
+        if action == "word_to_text":
+            try:
+                text = extract_text_from_docx(raw)
+            except ValueError as e:
+                error = str(e)
+            else:
+                return render_template("index.html", error=error, ai_result=ai_result, text=text or "(Boş)")
+
+    return render_template("index.html", error=error, ai_result=ai_result, text=text)
+
+
+@app.route("/generate-qr", methods=["POST"])
+def generate_qr():
+    try:
+        qr_text = request.form.get("qr_text", "").strip()
+        size = int(request.form.get("qr_size", 512))
         if not qr_text:
-            return jsonify({"error": "Lütfen bir metin veya link girin"}), 400
-        
-        # QR kod oluştur
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
+            return jsonify({"error": "Metin veya link girin"}), 400
+        size = max(128, min(2048, size))
+    except (ValueError, TypeError):
+        return jsonify({"error": "Geçersiz boyut"}), 400
+
+    try:
+        import qrcode
+        buf = io.BytesIO()
+        qr = qrcode.QRCode(version=1, box_size=10, border=4)
         qr.add_data(qr_text)
         qr.make(fit=True)
-        
-        # Resim oluştur
         img = qr.make_image(fill_color="black", back_color="white")
-        img = img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
-        
-        # Byte buffer'a kaydet
-        img_io = io.BytesIO()
-        img.save(img_io, 'PNG')
-        img_io.seek(0)
-        
-        return send_file(
-            img_io,
-            mimetype='image/png',
-            as_attachment=True,
-            download_name=f'qr-code-{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
-        )
-        
+        img = img.resize((size, size))
+        img.save(buf, format="PNG")
+        buf.seek(0)
+        return send_file(buf, mimetype="image/png", as_attachment=False, download_name="qr-code.png")
     except Exception as e:
-        return jsonify({"error": f"QR kod oluşturma hatası: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/compress-image', methods=['POST'])
+@app.route("/compress-image", methods=["POST"])
 def compress_image():
-    """Resim sıkıştırma endpoint'i"""
+    file = request.files.get("file")
+    if not file or file.filename == "":
+        return jsonify({"error": "Dosya seçin"}), 400
     try:
-        file = request.files.get('file')
-        quality = int(request.form.get('quality', 80))
-        
-        if not file:
-            return jsonify({"error": "Lütfen bir resim dosyası seçin"}), 400
-        
-        # Resmi aç
-        img = Image.open(file.stream)
-        
-        # RGB'ye çevir (RGBA ise)
-        if img.mode in ('RGBA', 'LA', 'P'):
-            background = Image.new('RGB', img.size, (255, 255, 255))
-            if img.mode == 'P':
-                img = img.convert('RGBA')
-            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
-            img = background
-        
-        # Sıkıştır
-        img_io = io.BytesIO()
-        img.save(img_io, format='JPEG', quality=quality, optimize=True)
-        img_io.seek(0)
-        
-        original_filename = file.filename.rsplit('.', 1)[0]
-        
-        return send_file(
-            img_io,
-            mimetype='image/jpeg',
-            as_attachment=True,
-            download_name=f'{original_filename}_compressed.jpg'
-        )
-        
+        quality = int(request.form.get("quality", 80))
+        quality = max(10, min(100, quality))
+    except (ValueError, TypeError):
+        quality = 80
+
+    try:
+        from PIL import Image
+        img = Image.open(io.BytesIO(file.read()))
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=quality, optimize=True)
+        buf.seek(0)
+        return send_file(buf, mimetype="image/jpeg", as_attachment=True, download_name="image_compressed.jpg")
     except Exception as e:
-        return jsonify({"error": f"Sıkıştırma hatası: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/image-to-pdf', methods=['POST'])
+@app.route("/image-to-pdf", methods=["POST"])
 def image_to_pdf():
-    """Resimden PDF oluşturma endpoint'i"""
+    file = request.files.get("file")
+    if not file or file.filename == "":
+        return jsonify({"error": "Dosya seçin"}), 400
+
     try:
-        file = request.files.get('file')
-        
-        if not file:
-            return jsonify({"error": "Lütfen bir resim dosyası seçin"}), 400
-        
-        # Resmi aç
-        img = Image.open(file.stream)
-        
-        # RGB'ye çevir
-        if img.mode in ('RGBA', 'LA', 'P'):
-            background = Image.new('RGB', img.size, (255, 255, 255))
-            if img.mode == 'P':
-                img = img.convert('RGBA')
-            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
-            img = background
-        
-        # PDF'e kaydet
-        pdf_io = io.BytesIO()
-        img.save(pdf_io, format='PDF')
-        pdf_io.seek(0)
-        
-        original_filename = file.filename.rsplit('.', 1)[0]
-        
-        return send_file(
-            pdf_io,
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name=f'{original_filename}.pdf'
-        )
-        
+        from PIL import Image
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.utils import ImageReader
+        from reportlab.pdfgen import canvas
+
+        raw = file.read()
+        img = Image.open(io.BytesIO(raw))
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format="JPEG", quality=95)
+        img_bytes.seek(0)
+
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf, pagesize=A4)
+        w, h = A4
+        iw, ih = img.size
+        scale = min(w / iw, h / ih)
+        c.drawImage(ImageReader(img_bytes), 0, 0, width=iw * scale, height=ih * scale)
+        c.save()
+        buf.seek(0)
+        return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name="image.pdf")
     except Exception as e:
-        return jsonify({"error": f"PDF oluşturma hatası: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.errorhandler(413)
-def too_large(e):
-    """Dosya boyutu çok büyükse"""
-    return render_template('index.html', 
-                         error="Dosya çok büyük! Maksimum 16MB yükleyebilirsiniz."), 413
-
-
-@app.errorhandler(500)
-def server_error(e):
-    """Sunucu hatası"""
-    return render_template('index.html', 
-                         error="Sunucu hatası oluştu. Lütfen tekrar deneyin."), 500
-
-
-if __name__ == '__main__':
-    # Templates klasörünün var olduğundan emin ol
-    if not os.path.exists('templates'):
-        os.makedirs('templates')
-    
-    print("🚀 Nexus Convert AI Edition başlatılıyor...")
-    print("📍 http://127.0.0.1:5000")
-    print("🤖 AI Özet özelliği aktif!")
-    
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
