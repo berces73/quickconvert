@@ -1,3 +1,5 @@
 flask
 pdfplumber
 gunicorn
+Pillow
+pdf2image
