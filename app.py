@@ -2,56 +2,55 @@ import os
 from flask import Flask, render_template, request, send_file
 import pdfplumber
 from docx import Document
-from PIL import Image
-import qrcode
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer
+import nltk
 import io
 
+# NLTK verilerini indir (Özetleme için gerekli)
+nltk.download('punkt')
+
 app = Flask(__name__)
+
+def summarize_text(text):
+    if len(text) < 100: return "Özetlemek için çok kısa bir metin."
+    parser = PlaintextParser.from_string(text, Tokenizer("turkish"))
+    summarizer = LsaSummarizer()
+    summary = summarizer(parser.document, 3) # En önemli 3 cümleyi seçer
+    return " ".join([str(sentence) for sentence in summary])
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     extracted_text = None
-    stats = None
+    summary = None
     if request.method == 'POST':
         action = request.form.get('action')
-        
-        if action == 'generate_qr':
-            qr_data = request.form.get('qr_text')
-            img = qrcode.make(qr_data)
-            buf = io.BytesIO()
-            img.save(buf, format='PNG')
-            buf.seek(0)
-            return send_file(buf, as_attachment=True, download_name="qrcode_mega.png")
-
         file = request.files.get('file')
+
         if file:
             try:
-                if action == 'pdf_to_text':
+                text = ""
+                if action == 'pdf_to_ai' or action == 'pdf_to_text':
                     with pdfplumber.open(file) as pdf:
                         text = "\n".join([page.extract_text() or "" for page in pdf.pages])
-                    extracted_text = text
-                    stats = {"words": len(text.split()), "chars": len(text)}
                 
-                elif action == 'word_to_text':
+                elif action == 'word_to_ai':
                     doc = Document(file)
                     text = "\n".join([para.text for para in doc.paragraphs])
-                    extracted_text = text
-                    stats = {"words": len(text.split()), "chars": len(text)}
 
-                elif action == 'compress_img':
-                    img = Image.open(file)
-                    buf = io.BytesIO()
-                    img.save(buf, format=img.format, quality=25, optimize=True)
-                    buf.seek(0)
-                    return send_file(buf, as_attachment=True, download_name=f"ultra_compressed_{file.filename}")
-
-                return render_template('index.html', text=extracted_text, stats=stats)
-            except Exception as e:
-                return render_template('index.html', error="İşlem başarısız oldu.")
+                if 'to_ai' in action:
+                    summary = summarize_text(text)
+                    return render_template('index.html', ai_result=summary)
+                else:
+                    return render_template('index.html', text=text)
+            except:
+                return render_template('index.html', error="AI analizi başarısız.")
     return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
