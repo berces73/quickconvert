@@ -3,96 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusConvert | Next-Gen Tools</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Nexus AI - Smart Document Intelligence</title>
     <style>
-        :root { --bg: #050505; --accent: #6366f1; --accent-glow: rgba(99, 102, 241, 0.4); --glass: rgba(255, 255, 255, 0.03); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #fff; margin: 0; min-height: 100vh; background-image: radial-gradient(circle at 50% -20%, #1e1b4b, transparent); }
-        
-        .nav { padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .hero { text-align: center; padding: 100px 20px; }
-        .hero h1 { font-size: 4.5rem; font-weight: 800; letter-spacing: -3px; margin: 0; line-height: 1; }
-        .hero p { color: #94a3b8; font-size: 1.2rem; margin-top: 20px; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; max-width: 1200px; margin: -50px auto 100px; padding: 0 20px; }
-        .card { background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 32px; padding: 40px; backdrop-filter: blur(20px); transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
-        .card:hover { border-color: var(--accent); box-shadow: 0 0 30px var(--accent-glow); transform: translateY(-10px); }
-        
-        .card-icon { width: 50px; height: 50px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; font-size: 1.5rem; }
-        
-        select, input, button { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 15px; border-radius: 16px; width: 100%; margin-top: 15px; font-family: inherit; }
-        button { background: #fff; color: #000; font-weight: 700; cursor: pointer; border: none; transition: 0.3s; margin-top: 25px; }
-        button:hover { background: var(--accent); color: #fff; }
-
-        .result-panel { background: #0a0a0a; border-radius: 32px; padding: 40px; margin-top: 50px; border: 1px solid var(--accent); }
-        textarea { background: transparent; border: none; width: 100%; height: 300px; color: #94a3b8; font-size: 1rem; line-height: 1.6; resize: none; outline: none; }
-        
-        .badge-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        .badge { background: rgba(99, 102, 241, 0.1); color: var(--accent); padding: 5px 15px; border-radius: 99px; font-size: 0.8rem; font-weight: 600; }
+        :root { --bg: #030014; --ai-purple: #7000ff; --ai-cyan: #00d2ff; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; }
+        .ai-border { background: linear-gradient(90deg, var(--ai-purple), var(--ai-cyan)); height: 4px; }
+        .container { max-width: 1000px; margin: 50px auto; padding: 20px; text-align: center; }
+        .ai-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(112, 0, 255, 0.3); padding: 40px; border-radius: 30px; margin-bottom: 30px; box-shadow: 0 0 30px rgba(112, 0, 255, 0.1); }
+        .ai-badge { background: linear-gradient(45deg, var(--ai-purple), var(--ai-cyan)); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        button { background: white; color: black; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; width: 100%; }
+        button:hover { transform: scale(1.02); box-shadow: 0 0 20px var(--ai-cyan); }
+        .ai-output { background: #0a0a0a; border: 1px solid var(--ai-cyan); padding: 25px; border-radius: 20px; margin-top: 30px; text-align: left; line-height: 1.6; }
     </style>
 </head>
 <body>
-    <div class="nav">
-        <div class="logo">NEXUS.CONVERT</div>
-        <div style="color: #64748b; font-size: 0.9rem;">v2.0 Beta</div>
-    </div>
-
-    <div class="hero">
-        <h1>Basit. Güçlü. Hızlı.</h1>
-        <p>iLovePDF'den daha fazlasını isteyenler için tasarlandı.</p>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <div class="card-icon">📁</div>
-            <h3>Akıllı Belge İşleyici</h3>
-            <p style="color: #64748b; font-size: 0.9rem;">PDF ve Word belgelerini yapay zeka titizliğiyle metne dönüştürün.</p>
-            <form method="post" enctype="multipart/form-data">
-                <select name="action">
-                    <option value="pdf_to_text">PDF -> Metin</option>
-                    <option value="word_to_text">Word -> Metin</option>
-                </select>
-                <input type="file" name="file" required>
-                <button type="submit">Dönüştür</button>
-            </form>
+    <div class="ai-border"></div>
+    <div class="container">
+        <div class="header">
+            <span class="ai-badge">AI ACTIVE</span>
+            <h1 style="font-size: 3.5rem; margin: 10px 0;">Nexus AI Document</h1>
+            <p style="color: #888;">Belgelerinizi sadece dönüştürmeyin, onları yapay zeka ile anlayın.</p>
         </div>
 
-        <div class="card">
-            <div class="card-icon">⚡</div>
-            <h3>Ultra Sıkıştırma</h3>
-            <p style="color: #64748b; font-size: 0.9rem;">Görselleri kaliteden ödün vermeden en düşük boyuta indirger.</p>
-            <form method="post" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="compress_img">
-                <input type="file" name="file" accept="image/*" required>
-                <button type="submit">Optimize Et</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <div class="card-icon">🔗</div>
-            <h3>QR Studio</h3>
-            <p style="color: #64748b; font-size: 0.9rem;">Linklerinizi veya metinlerinizi minimalist QR kodlara çevirin.</p>
-            <form method="post">
-                <input type="hidden" name="action" value="generate_qr">
-                <input type="text" name="qr_text" placeholder="Veriyi buraya girin..." required>
-                <button type="submit">QR Oluştur</button>
-            </form>
-        </div>
-    </div>
-
-    {% if text %}
-    <div style="max-width: 1200px; margin: 0 auto 100px; padding: 0 20px;">
-        <div class="result-panel">
-            <div class="badge-group">
-                <span class="badge">Karakter: {{ stats.chars }}</span>
-                <span class="badge">Kelime: {{ stats.words }}</span>
+        <div class="grid">
+            <div class="ai-card">
+                <h3>🤖 AI PDF Özetleyici</h3>
+                <p>PDF'i yükleyin, AI size en önemli kısımları özetlesin.</p>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="pdf_to_ai">
+                    <input type="file" name="file" required>
+                    <button type="submit">AI ile Analiz Et</button>
+                </form>
             </div>
-            <textarea readonly>{{ text }}</textarea>
+
+            <div class="ai-card">
+                <h3>📝 AI Word Analizörü</h3>
+                <p>Word dosyalarındaki ana fikirleri anında yakalayın.</p>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="word_to_ai">
+                    <input type="file" name="file" required>
+                    <button type="submit">AI Özet Al</button>
+                </form>
+            </div>
         </div>
+
+        {% if ai_result %}
+        <div class="ai-output">
+            <h3 style="color: var(--ai-cyan);">✨ Yapay Zeka Özeti:</h3>
+            <p>{{ ai_result }}</p>
+        </div>
+        {% endif %}
+
+        {% if text %}
+        <div class="ai-output" style="border-color: #555;">
+            <h3>📄 Ham Metin Çıktısı:</h3>
+            <textarea style="width:100%; height:200px; background:transparent; color:#ccc; border:none; outline:none;">{{ text }}</textarea>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </body>
 </html>
 
