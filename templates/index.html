@@ -2,24 +2,34 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>QuickConvert - Hızlı PDF Dönüştürücü</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ücretsiz PDF - Metin Dönüştürücü</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; text-align: center; padding: 50px; }
-        .upload-container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: inline-block; }
-        .btn-convert { background: #2ecc71; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 18px; margin-top: 20px; }
-        .btn-convert:hover { background: #27ae60; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f4f7f6; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-block; max-width: 500px; }
         h1 { color: #2c3e50; }
+        input[type="file"] { margin: 20px 0; }
+        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #2980b9; }
+        .footer-text { margin-top: 40px; color: #7f8c8d; font-size: 14px; line-height: 1.6; }
     </style>
 </head>
 <body>
-    <div class="upload-container">
-        <h1>QuickConvert</h1>
-        <p>PDF dosyanızı seçin ve anında metne dönüştürün.</p>
-        <form action="/convert" method="post" enctype="multipart/form-data">
-            <input type="file" name="pdf_file" accept=".pdf" required>
+    <div class="container">
+        <h1>PDF'i Metne Çevir</h1>
+        <p>Hızlı, ücretsiz ve güvenli dönüşüm.</p>
+        
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".pdf" required>
             <br>
-            <button type="submit" class="btn-convert">Dönüştür ve İndir</button>
+            <button type="submit">Hemen Dönüştür</button>
         </form>
+    </div>
+
+    <div class="footer-text">
+        <h3>Neden Bu Aracı Kullanmalısınız?</h3>
+        <p>PDF dosyalarınızı metne çevirmek artık çok kolay. Sunucularımızda dosya saklamıyoruz, <br> 
+        tamamen gizlilik odaklı çalışıyoruz. Hemen PDF yükleyerek TXT formatında çıktı alabilirsiniz.</p>
     </div>
 </body>
 </html>
