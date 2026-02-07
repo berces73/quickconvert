@@ -1,17 +1,18 @@
-FROM node:18
+FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-RUN npm install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PORT=10000
-EXPOSE 10000
+EXPOSE 5000
 
-CMD ["node", "index.js"]
+CMD ["gunicorn", "-c", "gunicorn_config.py", "app:app"]
 
 
 
