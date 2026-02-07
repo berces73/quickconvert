@@ -2,4 +2,4 @@ flask
 pdfplumber
 gunicorn
 Pillow
-pdf2image
+python-docx
